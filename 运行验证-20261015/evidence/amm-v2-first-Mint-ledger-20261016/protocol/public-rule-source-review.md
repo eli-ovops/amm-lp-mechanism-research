@@ -1,0 +1,19 @@
+# 同交易公开付款规则静态审阅
+
+限定通过，但须保留一项会改变收入来源解释的源码细节。三份原响应hash/字节与回执一致；Stacy、StacyVault有源码及ABI、provider声明Proxy0；`222207…`源码为空。无独立编译、历史runtime或首次公开时间证明。0网络，未执行来源代码。
+
+Stacy的cherryPop按指定池token余额、距上次调用时间及可变比例计算金额；还检查生成完成、规定外部代币持有资格与最小金额。注释“每24小时1%”不等于严格每天一次的强制调度，初始两个1也不能直接当目标日参数。调用者部分走`_transfer`，该函数先扣sender nominal amount，再由外部transferChecker决定实际接收者和分配份额；历史checker、比例和地址状态尚未取得。
+
+**重要：非burn分支并未显示与余款Transfer对应的pair扣账。** 完整函数的该分支只增加`_balances[feeDistributor]`，emit以pair为from的Transfer并调用addPendingRewards；未见同分支从pair余额扣掉这笔余款。此前调用者部分通过_transfer扣账；burn分支则明确调用_burn。因此不能说log901全额已从池库存扣走，不能仅据该Transfer当成独立余额差，也不能叫外部换币客户付的普通V2手续费。这里仅陈述已读源码，不运行或推演利用方式；实际历史余额未核。
+
+实际log900、901之和为868415764185880718152962 raw，与log903的总量一致：调用地址8684157641858807181529，Vault859731606544021910971433。调用地址量在算术上等于总量整除100，但外部checker及可改参数尚未核，不能据此独立重构全部历史配置。分配模式与源码相容，不是完整调用轨迹或状态证明。pair.sync也不是客户支付费用的证据。
+
+Vault的addPendingRewards按真实token余额与内部stacyBalance的差计新增待分配，不直接信传入参数；massUpdatePools按allocation和池token余额分摊，扣开发者份额后累加accStacyPerShare。用户pending依赖已有amount与rewardDebt。deposit/depositFor均可能先结算pending；付款人、受益人可分离。withdraw及授权withdrawFrom有各自资格检查；emergencyWithdraw不结算pending。其Deposit/Withdraw/EmergencyWithdraw具有相同indexed/data形状，没有精确签名依据不能强行按形状定路径，更不能只据付款或sender/to确定新增权利还是旧权益兑现。
+
+奖励函数还涉及即时支付和外部rewardsLock；`222207…`未取得验证源码，历史配置、锁/债权与旧权益均UNKNOWN。不提供保护绕过或执行流程。
+
+两份源码LicenseType空、均无SPDX，第三份为Unknown且无源。不能继承Uniswap V2的GPL许可，组合源码完整复用许可和事前公开时点未证；也不能把公开可读一概称MIT。
+
+原账的正WETH事件净流与实际gas事实不变：明确ETH/WETH 1:1数量比较的组件仍为+0.000180477909427969，USDC/WBTC各−1 raw。上述源/状态缺口限制“完整经济利润”的解释，不否认观察到的现金数量，也不新增完整私人bot门槛。不称持续LP收入、完整净利或容量通过。
+
+完整相关函数、规范化源码行号、实际日志、来源URL/UTC/hash及许可声明见同名JSON；实际model/effort为UNKNOWN。
